@@ -38,6 +38,32 @@ export const AddMedicationScreen: React.FC<Props> = ({ medicationId, onSaved, on
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+  const [suggestions, setSuggestions] = useState<MedicineSuggestion[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [suppressSearch, setSuppressSearch] = useState(false);
+
+  useEffect(() => {
+    if (suppressSearch) { setSuppressSearch(false); return; }
+    const q = name.trim();
+    if (q.length < 2) { setSuggestions([]); return; }
+    setSearching(true);
+    const handle = setTimeout(async () => {
+      try {
+        const results = await searchMedicines(q, 8);
+        setSuggestions(results);
+      } finally {
+        setSearching(false);
+      }
+    }, 350);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name]);
+
+  const pickSuggestion = (s: MedicineSuggestion) => {
+    setSuppressSearch(true);
+    setName(s.name);
+    setSuggestions([]);
+  };
 
   useEffect(() => {
     if (!medicationId) return;
@@ -121,9 +147,33 @@ export const AddMedicationScreen: React.FC<Props> = ({ medicationId, onSaved, on
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="e.g. Metformin"
+            placeholder="Start typing to search…"
             placeholderTextColor={Colors.outline}
+            autoCorrect={false}
+            autoCapitalize="words"
           />
+          {(searching || suggestions.length > 0) && (
+            <View style={styles.suggestionBox}>
+              {searching && (
+                <View style={styles.suggestionRow}>
+                  <ActivityIndicator size="small" color={Colors.primary} />
+                  <Text style={styles.suggestionHint}>Searching medicines…</Text>
+                </View>
+              )}
+              {suggestions.map(s => (
+                <TouchableOpacity
+                  key={s.rxcui ?? s.name}
+                  style={styles.suggestionRow}
+                  onPress={() => pickSuggestion(s)}
+                >
+                  <Text style={styles.suggestionText} numberOfLines={1}>{s.name}</Text>
+                </TouchableOpacity>
+              ))}
+              {suggestions.length > 0 && (
+                <Text style={styles.suggestionCredit}>Source: RxNorm (US NLM)</Text>
+              )}
+            </View>
+          )}
         </Field>
 
         <Field label="Generic Name" placeholder="Optional">
@@ -252,4 +302,30 @@ const styles = StyleSheet.create({
   formChipIcon: { fontSize: 20, marginBottom: 2 },
   formChipLabel: { ...Typography.labelSm, color: Colors.onSurfaceVariant },
   formChipLabelSelected: { color: Colors.primary, fontWeight: '700' },
+  suggestionBox: {
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
+    borderRadius: Radius.DEFAULT,
+    backgroundColor: Colors.surfaceContainerLowest,
+    overflow: 'hidden',
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.outlineVariant,
+  },
+  suggestionText: { ...Typography.bodyMd, color: Colors.onSurface, flex: 1 },
+  suggestionHint: { ...Typography.labelSm, color: Colors.onSurfaceVariant },
+  suggestionCredit: {
+    ...Typography.labelSm,
+    color: Colors.outline,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 6,
+    textAlign: 'right',
+  },
 });
