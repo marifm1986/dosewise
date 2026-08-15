@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Medications — owner can CRUD; caregivers can read
+    match /medications/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && isCaregiverOf(resource.data.userId);
+    }
+
+    // Schedules — same as medications
+    match /schedules/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && isCaregiverOf(resource.data.userId);
+    }
+
+    // Dose logs — owner can CRUD; caregivers can read
+    match /doseLogs/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && isCaregiverOf(resource.data.userId);
+    }
+
+    // Caregiver relations — caregiver or patient can read; caregiver can create
+    match /caregiverRelations/{docId} {
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.caregiverId ||
+        request.auth.uid == resource.data.patientId
+      );
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.caregiverId;
+      allow update: if request.auth != null && request.auth.uid == resource.data.patientId;
+    }
+
+    // Helper: check if requesting user is an accepted caregiver of patientId
+    function isCaregiverOf(patientId) {
+      return exists(/databases/$(database)/documents/caregiverRelations/$(request.auth.uid + '_' + patientId))
+        && get(/databases/$(database)/documents/caregiverRelations/$(request.auth.uid + '_' + patientId)).data.status == 'accepted';
+    }
+  }
+}

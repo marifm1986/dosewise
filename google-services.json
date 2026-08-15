@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "342483569949",
+    "project_id": "medicinetracker360",
+    "storage_bucket": "medicinetracker360.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342483569949:android:55545539889225f12025f4",
+        "android_client_info": {
+          "package_name": "com.techwake360.dosewise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "342483569949-n15bjc6rt8jcbjq5bv75g0esqdvl13rf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1ptkVWVi2CtjQXppTfmfzVaseZ0sidLg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "342483569949-n15bjc6rt8jcbjq5bv75g0esqdvl13rf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

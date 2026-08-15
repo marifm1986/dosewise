@@ -1,25 +1,48 @@
 {
   "expo": {
-    "name": "dosewise",
+    "name": "DoseWise",
     "slug": "dosewise",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#f9f9ff"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.techwake360.dosewise",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
+      "package": "com.techwake360.dosewise",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#0043a2",
+        "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-notifications",
+        {
+          "color": "#0043a2",
+          "sounds": []
+        }
+      ]
+    ],
+    "scheme": "dosewise",
+    "extra": {
+      "eas": {
+        "projectId": "ea1788cd-71ff-4f80-ae3d-2a7ed2b687e5"
+      }
+    },
+    "owner": "marifm1986"
   }
 }
